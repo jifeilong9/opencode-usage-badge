@@ -2,17 +2,27 @@
 
 [DeepSeek Harness](https://deepseek-harness.github.io/deepseek-harness/)（DSH）Web UI 插件：在输入框左侧（模型选择器旁）显示 **opencode go 用量徽章**——滚动 / 周 / 月三个时间窗的用量百分比，悬停显示各窗口的重置倒计时。
 
-从 [dsh-utils](https://github.com/jifeilong9/dsh-utils) 中单独拆出的用量徽章部分，安装方式与行为完全一致，不包含文件管理器等其他功能。
+本插件是从 [dsh-utils](https://github.com/jifeilong9/dsh-utils) 中单独拆出的用量徽章部分，安装方式与行为完全一致，不包含文件管理器等其他功能。
 
-## 功能
+## 效果预览
+
+![用量徽章显示在输入框工具行（模型选择器左侧）](assets/screenshot.png)
+
+徽章显示在输入框工具行、模型选择器左侧：`● 用量 {滚动}% · 周 {周}%`。点击徽章立即刷新，每 10 分钟自动轮询。
+
+![悬停徽章显示三个时间窗用量与重置倒计时](assets/tooltip.png)
+
+悬停徽章可查看完整详情：`用量：滚动 x% · 周 y% · 月 z%`，以及滚动 / 周 / 月三个窗口的重置倒计时（如 `2天14小时`、`28天16小时`）。
+
+## 功能特性
 
 - **显示条件**（满足其一即显示，其他模型自动隐藏）：
   1. 当前会话模型的 **provider id 为 `opencode-go`**（可通过配置 `providerId` 修改）
   2. 或该 provider 在模型配置里声明的 **baseURL 指向 `https://opencode.ai/zen/go`**（可通过配置 `baseUrlPrefix` 修改；host 端判定，兼容任意 provider 键名）
-- 每 10 分钟自动轮询，点击徽章立即刷新
-- 悬停提示：`用量：滚动 x% · 周 y% · 月 z%` + 三个窗口的重置倒计时
-- 颜色预警：`<70%` 正常 · `70–89%` 橙色 · `≥90%` 红色
-- 断网兜底：请求失败自动重试（3 次），仍失败时回退显示上次成功数据并标注"缓存数据"
+- **自动轮询**：每 10 分钟拉取一次用量，点击徽章立即刷新
+- **悬停提示**：三个时间窗的用量百分比 + 各窗口的重置倒计时
+- **颜色预警**：`<70%` 正常 · `70–89%` 橙色 · `≥90%` 红色
+- **断网兜底**：请求失败自动重试（3 次），仍失败时回退显示上次成功数据并标注"缓存数据"
 
 ## 安装
 
@@ -28,7 +38,7 @@ dsh plugin --profile web add opencode-usage-badge
 
 > 首次安装若提示 `ERR_PNPM_IGNORED_BUILDS`，把 pnpm 打印的包键加入 profile 的 `pnpm-workspace.yaml` 的 `allowBuilds` 后重新执行即可。
 
-## API Key 解析（不内嵌任何 Key）
+## 工作原理：API Key 解析（不内嵌任何 Key）
 
 插件包内**不包含任何 API Key**，运行时按以下链路解析（与模型路由共用同一份配置）：
 
@@ -68,6 +78,7 @@ npm pack           # 打包 tarball
 ### 目录结构
 
 ```
+├── assets/         # 文档截图
 ├── src/            # client 源码（浏览器端，esbuild 构建）
 ├── lib/            # 构建产物
 │   ├── index.js    # host 端：usageBadge Typert Remote（用量查询 + Key 解析）
