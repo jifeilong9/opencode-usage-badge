@@ -1,0 +1,5 @@
+# opencode-usage-badge bundle patch: mount the host plugin under its package
+# name, resolved through the profile's node_modules.
+- insert:
+    - id: opencode-usage-badge
+      name: opencode-usage-badge
