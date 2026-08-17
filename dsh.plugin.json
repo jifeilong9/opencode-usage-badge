@@ -1,6 +1,6 @@
 {
   "id": "opencode-usage-badge",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "main": "lib/index.js",
   "description": "DSH web plugin: opencode go usage badge (rolling/weekly/monthly percent + reset countdown).",
   "engines": {
