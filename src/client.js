@@ -113,7 +113,7 @@ const USAGE_REMOTE = {
       namespace: "usageBadge",
       method: "usage",
       invocation: { kind: "direct" },
-      parameters: [jsonParam("provider")],
+      parameters: [jsonParam("provider"), jsonParam("force", true)],
       cancellation: { parameter: "signal" },
       result: { mode: "strict", typeSymbol: "opencode-usage-badge#UsageReport", schema: PASS_SCHEMA },
     },
@@ -174,6 +174,9 @@ function UsageBadge(props) {
   const [error, setError] = React.useState(null);
   const [nonce, setNonce] = React.useState(0);
   const [now, setNow] = React.useState(() => Date.now());
+  // Set by a badge click; the next poll bypasses the host-side per-provider
+  // cache so clicking always fetches a fresh report.
+  const forceRef = React.useRef(false);
 
   // The badge shows when the host confirms the provider route is opencode:
   // its id is the configured opencode provider id, or its declared baseURL
@@ -251,8 +254,10 @@ function UsageBadge(props) {
     let cancelled = false;
     let timer = null;
     const refresh = () => {
+      const force = forceRef.current === true;
+      forceRef.current = false;
       Promise.resolve()
-        .then(() => usageCall(provider))
+        .then(() => usageCall(provider, force))
         .then((result) => {
           if (cancelled) return;
           if (result != null && result.ok === true) {
@@ -299,7 +304,10 @@ function UsageBadge(props) {
         type: "button",
         className: "ocu-usage ocu-usage-danger",
         title: fmt("reload", {}),
-        onClick: () => setNonce((n) => n + 1),
+        onClick: () => {
+          forceRef.current = true;
+          setNonce((n) => n + 1);
+        },
         "aria-label": message,
       },
       React.createElement("span", { className: "ocu-usage-dot" }),
@@ -330,7 +338,10 @@ function UsageBadge(props) {
       type: "button",
       className: "ocu-usage " + toneOf(rolling),
       title,
-      onClick: () => setNonce((n) => n + 1),
+      onClick: () => {
+          forceRef.current = true;
+          setNonce((n) => n + 1);
+        },
       "aria-label": label,
     },
     React.createElement("span", { className: "ocu-usage-dot" }),
@@ -376,10 +387,10 @@ function apply(ctx) {
     }, () => {});
   }, "opencode-usage-badge: remote cleanup");
 
-  const usage = async (provider) => {
+  const usage = async (provider, force) => {
     try {
       const { usageRemote } = await remotesPromise;
-      return usageRemote.usage(provider);
+      return usageRemote.usage(provider, force);
     } catch (err) {
       return { ok: false, error: { code: "MOUNT_FAILED", message: String(err && err.message ? err.message : err) } };
     }

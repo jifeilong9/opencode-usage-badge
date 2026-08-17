@@ -19,7 +19,8 @@
 - **显示条件**（满足其一即显示，其他模型自动隐藏）：
   1. 当前会话模型的 **provider id 为 `opencode-go`**（可通过配置 `providerId` 修改）
   2. 或该 provider 在模型配置里声明的 **baseURL 指向 `https://opencode.ai/zen/go`**（可通过配置 `baseUrlPrefix` 修改；host 端判定，兼容任意 provider 键名）
-- **自动轮询**：每 10 分钟拉取一次用量，点击徽章立即刷新
+- **自动轮询**：每 10 分钟拉取一次用量，点击徽章立即刷新（强制绕过缓存）
+- **全局共享**：用量按 provider 在 host 端全局缓存（默认 5 分钟，可配置 `cacheTtlMs`），多会话/多标签共用同一份报告，切换会话即时显示、不再重复请求
 - **悬停提示**：滚动 / 周 / 月三个窗口的重置倒计时（用量已在徽章本体显示）
 - **颜色预警**：`<70%` 正常 · `70–89%` 橙色 · `≥90%` 红色
 - **断网兜底**：请求失败自动重试（3 次），仍失败时回退显示上次成功数据并标注"缓存数据"
@@ -28,7 +29,7 @@
 
 ```sh
 # 本地 tarball（构建产物）
-dsh plugin --profile web add ./opencode-usage-badge-0.1.2.tgz
+dsh plugin --profile web add ./opencode-usage-badge-0.1.3.tgz
 
 # 发布到 npm 后
 dsh plugin --profile web add opencode-usage-badge
@@ -58,6 +59,7 @@ dsh plugin --profile web add opencode-usage-badge
     endpoint: https://opencode.ai/zen/go/v1/usage  # 可选：默认即此地址
     providerId: opencode-go   # 可选：默认即此值；provider 键名不同时改成自己的
     baseUrlPrefix: https://opencode.ai/zen/go  # 可选：默认即此前缀；baseURL 匹配前缀
+    cacheTtlMs: 300000  # 可选：用量全局缓存毫秒数，默认 5 分钟
 ```
 
 ### 对方 provider 键名不是 opencode-go 时

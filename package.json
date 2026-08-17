@@ -1,6 +1,6 @@
 {
   "name": "opencode-usage-badge",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DSH web plugin: an opencode go usage badge (rolling/weekly/monthly percent + reset countdown) next to the model selector. No API key is embedded: it is resolved at runtime from the model configuration.",
   "license": "MIT",
   "type": "module",
