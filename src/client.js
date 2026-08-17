@@ -6,7 +6,7 @@
  * Watches the active session's model selection; while the provider is
  * `opencode-go`, renders a usage badge into the composer's left tool row
  * (`conversation.input.left`) and polls the host `usageBadge` Remote every
- * 10 minutes (click to refresh immediately; hovering shows monthly percent +
+ * 10 minutes (click to refresh immediately; hovering shows the three windows'
  * reset countdowns). Failed polls fall back to the last successful report
  * (marked as cached), so the badge never flickers empty.
  *
@@ -20,8 +20,7 @@ const React = require("react");
 const NS = "opencode-usage-badge";
 
 const zh = {
-  badge: "用量 {rolling}% · 周 {weekly}%",
-  badgeTitle: "用量：滚动 {rolling}% · 周 {weekly}% · 月 {monthly}%",
+  badge: "用量 {rolling}% · 周 {weekly}% · 月 {monthly}%",
   badgeError: "用量获取失败：{message}",
   reload: "点击刷新",
   resetAll: "重置：滚动 {rolling} · 周 {weekly} · 月 {monthly}",
@@ -37,8 +36,7 @@ const zh = {
 };
 
 const en = {
-  badge: "Usage {rolling}% · weekly {weekly}%",
-  badgeTitle: "Usage: rolling {rolling}% · weekly {weekly}% · monthly {monthly}%",
+  badge: "Usage {rolling}% · weekly {weekly}% · monthly {monthly}%",
   badgeError: "Usage fetch failed: {message}",
   reload: "Click to refresh",
   resetAll: "Reset: rolling {rolling} · weekly {weekly} · monthly {monthly}",
@@ -323,7 +321,7 @@ function UsageBadge(props) {
   };
   const stale = usage !== null && usage.stale === true;
   const title = usage !== null
-    ? fmt("badgeTitle", values) + "\n" + fmt("resetAll", resetValues) + (stale ? "\n" + t("staleSuffix") : "")
+    ? fmt("resetAll", resetValues) + (stale ? "\n" + t("staleSuffix") : "")
     : fmt("reload", {});
   const label = fmt("badge", values);
   return React.createElement(
